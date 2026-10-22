@@ -1,0 +1,26 @@
+@{
+    ViewData["Title"] = "Admin dashboard";
+    var applications = (List<HostApplication>)ViewBag.Pending;
+    var logs = (List<ActivityLog>)ViewBag.RecentActivity;
+}
+<p class="eyebrow">Administration</p><h1>Marketplace overview</h1>
+<div class="metrics">
+    <div class="panel"><span>Registered users</span><strong>@ViewBag.Users</strong></div>
+    <div class="panel"><span>Pending applications</span><strong>@ViewBag.PendingApplications</strong></div>
+    <div class="panel"><span>Active properties</span><strong>@ViewBag.ActiveProperties</strong></div>
+</div>
+<div class="actions"><a class="button secondary" asp-action="Logs">View full audit log</a>
+@if (User.IsInRole("SuperAdmin")) { <a class="button secondary" asp-action="Users">Promote Guests to Admin</a> }</div>
+<h2>Host applications awaiting review</h2>
+@if (applications.Count == 0) { <p class="empty">No pending applications.</p> }
+@foreach (var application in applications)
+{
+    <article class="panel row-between">
+        <div><h3>@application.Property?.Title</h3><p>@application.User?.FirstName @application.User?.LastName · @application.Property?.City</p></div>
+        <a class="button" asp-action="Application" asp-route-id="@application.Id">Review property &amp; images</a>
+    </article>
+}
+<h2>Recent activity</h2>
+<div class="table-wrap"><table><thead><tr><th>Time (UTC)</th><th>User</th><th>Activity</th><th>Type</th></tr></thead><tbody>
+@foreach (var log in logs) { <tr><td>@log.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td><td>@log.User?.Email</td><td>@log.Action</td><td>@log.ActivityType</td></tr> }
+</tbody></table></div>

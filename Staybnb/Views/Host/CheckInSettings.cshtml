@@ -1,0 +1,17 @@
+@model CheckInSettingsViewModel
+@{ ViewData["Title"] = "Check-in settings"; }
+<section class="panel form-panel"><h1>Configure check-in</h1><form asp-action="CheckInSettings" method="post">
+    <div asp-validation-summary="All" class="validation"></div><input asp-for="PropertyId" type="hidden" />
+    <label asp-for="Title"></label><input asp-for="Title" />
+    <label asp-for="Steps">Instructions and house rules (one step per line)</label><textarea asp-for="Steps" rows="8" placeholder="Arrival is after 14:00.&#10;Collect keys at reception.&#10;No smoking inside."></textarea>
+    <label asp-for="DocumentRequirement">Documents the Host must verify</label>
+    <select asp-for="DocumentRequirement">
+        <option value="IdOrPassport">ID or Passport</option>
+        <option value="IdAndPassport">Both ID and Passport</option>
+        <option value="IdOnly">ID only</option>
+        <option value="PassportOnly">Passport only</option>
+    </select>
+    <label asp-for="RequiredDocuments">Required document instructions</label><textarea asp-for="RequiredDocuments" rows="3"></textarea>
+    <p class="muted">Guests must accept the rules and have the required documents verified before completing check-in. Saving these instructions requires guests with unfinished check-ins to accept the rules again.</p>
+    <button>Save check-in process</button>
+</form></section>

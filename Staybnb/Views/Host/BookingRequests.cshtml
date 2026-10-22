@@ -1,0 +1,38 @@
+@model List<Booking>
+@using Staybnb.Services
+@{ ViewData["Title"] = "Host bookings"; }
+<p class="eyebrow">Host dashboard</p><h1>Bookings &amp; check-in documents</h1>
+@if (!Model.Any()) { <div class="empty">No booking requests yet.</div> }
+@foreach (var booking in Model)
+{
+    <article class="panel">
+        <div class="row-between"><h2>#@booking.Id · @booking.Property?.Title</h2><span class="status">@booking.Status</span></div>
+        <p>@booking.Guest?.FirstName @booking.Guest?.LastName · @booking.CheckInDate.ToString("dd MMM yyyy") – @booking.CheckOutDate.ToString("dd MMM yyyy") · @booking.Travelers traveler(s)</p>
+        <p><strong>R @booking.TotalPrice.ToString("N2")</strong> total</p>
+        <div class="actions">
+        @if (booking.Status == BookingStatus.Pending)
+        {
+            <form asp-action="BookingDecision" method="post"><input type="hidden" name="id" value="@booking.Id" /><input type="hidden" name="approve" value="true" /><button class="small">Approve</button></form>
+            <form asp-action="BookingDecision" method="post"><input type="hidden" name="id" value="@booking.Id" /><input type="hidden" name="approve" value="false" /><button class="small danger">Reject</button></form>
+        }
+        <a asp-controller="Inbox" asp-action="Thread" asp-route-otherId="@booking.GuestId">Message guest</a>
+        </div>
+        @if (booking.GuestCheckIn is not null)
+        {
+            <h3>Check-in documents</h3>
+            <p>Check-in: <span class="status">@booking.GuestCheckIn.Status</span> · Required: @CheckInRequirements.Describe(booking.GuestCheckIn.CheckInProcess?.DocumentRequirement ?? DocumentRequirement.IdOrPassport)</p>
+            @if (!booking.GuestCheckIn.Documents.Any()) { <p class="muted">No documents uploaded yet.</p> }
+            @foreach (var document in booking.GuestCheckIn.Documents)
+            {
+                <div class="document-row">
+                    <a asp-action="Document" asp-route-id="@document.Id">Download @document.DocumentType</a><span class="status">@document.Status</span>
+                    @if (booking.Status == BookingStatus.Approved)
+                    {
+                    <form asp-action="ReviewDocument" method="post"><input type="hidden" name="documentId" value="@document.Id" /><input type="hidden" name="approve" value="true" /><button class="small">Verify</button></form>
+                    <form asp-action="ReviewDocument" method="post"><input type="hidden" name="documentId" value="@document.Id" /><input type="hidden" name="approve" value="false" /><button class="small danger">Reject</button></form>
+                    }
+                </div>
+            }
+        }
+    </article>
+}

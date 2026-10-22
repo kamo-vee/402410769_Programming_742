@@ -1,0 +1,14 @@
+@using System.Security.Claims
+@model List<Message>
+@{ ViewData["Title"] = "Conversation"; var id = User.FindFirstValue(ClaimTypes.NameIdentifier); var other = (ApplicationUser)ViewBag.OtherUser; }
+<h1>Conversation with @other.FirstName @other.LastName</h1><p class="muted">@other.Email</p>
+<div class="thread">
+@foreach (var message in Model)
+{
+    <article class="message @(message.SenderId == id ? "sent" : "received")"><p>@message.Content</p><small>@message.Timestamp.ToString("dd MMM HH:mm") UTC · @(message.IsRead ? "Read" : "Unread")</small></article>
+}
+</div>
+<form asp-action="Reply" method="post" class="panel">
+    <input type="hidden" name="ReceiverId" value="@other.Id" /><label for="Content">Your message</label>
+    <textarea id="Content" name="Content" rows="4" maxlength="2000" required></textarea><button>Send message</button>
+</form>

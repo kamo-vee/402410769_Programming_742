@@ -1,0 +1,14 @@
+@using System.Security.Claims
+@model List<Message>
+@{ ViewData["Title"] = "Inbox"; var id = User.FindFirstValue(ClaimTypes.NameIdentifier); }
+<div class="section-heading"><div><p class="eyebrow">Keep in touch</p><h1>Your inbox</h1></div><a class="button" asp-action="Compose">New message</a></div>
+@if (!Model.Any()) { <p class="empty">No messages yet. Message a Host from a property page or send a new message using a registered user's email.</p> }
+@foreach (var message in Model)
+{
+    var received = message.ReceiverId == id;
+    var other = received ? message.Sender : message.Receiver;
+    <article class="panel row-between">
+        <div><h3>@(received ? "From" : "To") @other?.FirstName @other?.LastName</h3><p>@message.Content</p><small>@message.Timestamp.ToString("dd MMM yyyy HH:mm") UTC · @(message.IsRead ? "Read" : "Unread")</small></div>
+        <a asp-action="Thread" asp-route-otherId="@other?.Id">Open conversation</a>
+    </article>
+}

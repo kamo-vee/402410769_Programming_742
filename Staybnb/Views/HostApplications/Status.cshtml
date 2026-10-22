@@ -1,0 +1,8 @@
+@model List<HostApplication>
+@{ ViewData["Title"] = "Application status"; }
+<h1>Your host applications</h1>
+@if (!Model.Any()) { <p>No applications yet. <a asp-action="Create">Submit your first listing.</a></p> }
+@foreach (var application in Model)
+{
+    <article class="panel"><h2>@application.Property?.Title</h2><span class="status">@application.Status</span><p>Submitted @application.AppliedAt.ToString("dd MMM yyyy HH:mm") UTC</p></article>
+}

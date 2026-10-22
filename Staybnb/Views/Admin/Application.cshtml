@@ -1,0 +1,13 @@
+@model HostApplication
+@{ ViewData["Title"] = "Review host application"; }
+<p class="eyebrow">Application #@Model.Id · @Model.Status</p><h1>@Model.Property?.Title</h1>
+<p>Applicant: <strong>@Model.User?.FirstName @Model.User?.LastName</strong> · @Model.User?.Email</p>
+<div class="image-gallery">@foreach (var image in Model.Property!.Images) { <img src="@image.ImageUrl" alt="Submitted property image" /> }</div>
+<section class="panel"><p class="preserve-lines">@Model.Property.Description</p><p>@Model.Property.Address, @Model.Property.City</p><p>R @Model.Property.PricePerNight.ToString("N2") / night · @Model.Property.PropertyType · @Model.Property.MaxGuests guests</p></section>
+@if (Model.Status == ApplicationStatus.Pending)
+{
+    <div class="actions">
+        <form asp-action="ReviewApplication" method="post"><input type="hidden" name="id" value="@Model.Id" /><input type="hidden" name="approve" value="true" /><button>Approve application</button></form>
+        <form asp-action="ReviewApplication" method="post"><input type="hidden" name="id" value="@Model.Id" /><input type="hidden" name="approve" value="false" /><button class="danger">Reject application</button></form>
+    </div>
+}

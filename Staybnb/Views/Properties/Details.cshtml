@@ -1,0 +1,38 @@
+@model HostProperty
+@{ ViewData["Title"] = Model.Title; }
+<p class="eyebrow">@Model.PropertyType · @Model.City</p><h1>@Model.Title</h1><p class="muted">@Model.Address</p>
+<div class="image-gallery">
+@foreach (var image in Model.Images) { <img src="@image.ImageUrl" alt="@Model.Title property photo" /> }
+</div>
+<div class="two-column">
+    <section>
+        <h2>Your home away from home</h2><p class="preserve-lines">@Model.Description</p>
+        <p>Up to <strong>@Model.MaxGuests guests</strong> · Cleaning fee <strong>R @Model.CleaningFee.ToString("N2")</strong></p>
+        @if (Model.PropertyAmenities.Any())
+        {
+            <h3>Amenities</h3><div class="tags">@foreach (var item in Model.PropertyAmenities) { <span>@item.Amenity?.Name</span> }</div>
+        }
+        @if (Model.Reviews.Any())
+        {
+            <h3>Guest reviews</h3>
+            @foreach (var review in Model.Reviews) { <article class="panel"><strong>@review.Reviewer?.FirstName · @review.Rating / 5</strong><p>@review.Comment</p></article> }
+        }
+    </section>
+    <aside class="panel booking-summary">
+        <h2>R @Model.PricePerNight.ToString("N2") <small>/ night</small></h2>
+        <p>Service fee: 10% of the nightly subtotal. Cleaning is charged once per booking.</p>
+        @if (User.IsInRole("Guest"))
+        {
+            <a class="button" asp-controller="Bookings" asp-action="Create" asp-route-propertyId="@Model.Id">Choose dates &amp; request to book</a>
+        }
+        else if (User.Identity?.IsAuthenticated != true)
+        {
+            <a class="button" asp-controller="Account" asp-action="Login">Log in to book</a>
+        }
+        else { <p class="muted">Booking is available to Guest accounts only.</p> }
+        @if (User.Identity?.IsAuthenticated == true && User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value != Model.HostId)
+        {
+            <p><a asp-controller="Inbox" asp-action="Thread" asp-route-otherId="@Model.HostId">Message the host</a></p>
+        }
+    </aside>
+</div>

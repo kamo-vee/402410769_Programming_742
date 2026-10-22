@@ -1,0 +1,12 @@
+@model List<Notification>
+@{ ViewData["Title"] = "Notifications"; }
+<div class="section-heading"><div><p class="eyebrow">Stay in the loop</p><h1>Notifications</h1></div>
+<form asp-action="MarkAllRead" method="post"><button class="secondary">Mark all read</button></form></div>
+@if (!Model.Any()) { <p class="empty">You're all caught up. Updates will appear here.</p> }
+@foreach (var notification in Model)
+{
+    <article class="panel row-between">
+        <div><span class="status">@(notification.IsRead ? "Read" : "Unread") · @notification.Type</span><h2>@notification.Title</h2><p>@notification.Content</p><small>@notification.CreatedAt.ToString("dd MMM yyyy HH:mm") UTC</small></div>
+        @if (!notification.IsRead) { <form asp-action="MarkRead" method="post"><input type="hidden" name="id" value="@notification.Id" /><button class="small secondary">Mark read</button></form> }
+    </article>
+}

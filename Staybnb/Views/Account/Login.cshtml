@@ -1,0 +1,13 @@
+@model LoginViewModel
+@{ ViewData["Title"] = "Log in"; }
+<section class="panel narrow">
+    <p class="eyebrow">Welcome back</p><h1>Log in to Staybnb</h1>
+    <form asp-action="Login" method="post">
+        <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+        <div asp-validation-summary="All" class="validation"></div>
+        <label asp-for="Email">Email address</label><input asp-for="Email" autocomplete="username" />
+        <label asp-for="Password">Password</label><input asp-for="Password" autocomplete="current-password" />
+        <button type="submit">Log in</button>
+    </form>
+    <p>New here? <a asp-action="Register">Create an account</a></p>
+</section>

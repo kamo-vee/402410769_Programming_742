@@ -1,0 +1,58 @@
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@inject UserManager<ApplicationUser> UserManager
+@inject Staybnb.Data.StaybnbDbContext Db
+@{
+    var id = UserManager.GetUserId(User);
+    var unread = id is null ? 0 : await Db.Notifications.CountAsync(n => n.UserId == id && !n.IsRead);
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] · Staybnb</title>
+    <partial name="_Styles" />
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" asp-controller="Home" asp-action="Index">staybnb<span>find your next stay</span></a>
+        <nav aria-label="Main navigation">
+            <a asp-controller="Home" asp-action="Index">Explore</a>
+            @if (User.IsInRole("Guest"))
+            {
+                <a asp-controller="Bookings" asp-action="Mine">My trips</a>
+                <a asp-controller="HostApplications" asp-action="Create">Become a host</a>
+                <a asp-controller="HostApplications" asp-action="Status">Application status</a>
+            }
+            @if (User.IsInRole("Host"))
+            {
+                <a asp-controller="Host" asp-action="Index">Host dashboard</a>
+                <a asp-controller="Host" asp-action="BookingRequests">Bookings &amp; documents</a>
+            }
+            @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+            {
+                <a asp-controller="Admin" asp-action="Index">Administration</a>
+                <a asp-controller="Admin" asp-action="Logs">Audit log</a>
+            }
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a asp-controller="Inbox" asp-action="Index">Inbox</a>
+                <a asp-controller="Notifications" asp-action="Index">Notifications <span class="badge">@unread</span></a>
+                <form asp-controller="Account" asp-action="Logout" method="post" class="inline"><button class="link-button" type="submit">Sign out</button></form>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login">Log in</a>
+                <a class="button small" asp-controller="Account" asp-action="Register">Sign up</a>
+            }
+        </nav>
+    </header>
+    <main class="container">
+        @if (TempData["Message"] is string message) { <div class="alert success" role="status">@message</div> }
+        @if (TempData["Error"] is string error) { <div class="alert error" role="alert">@error</div> }
+        @RenderBody()
+    </main>
+    <footer>Staybnb · Programming 742 · Educational rental marketplace · All prices shown in ZAR</footer>
+</body>
+</html>

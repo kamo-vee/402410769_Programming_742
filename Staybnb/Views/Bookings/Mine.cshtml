@@ -1,0 +1,20 @@
+@model List<Booking>
+@{ ViewData["Title"] = "My trips"; }
+<p class="eyebrow">Guest dashboard</p><h1>Your next chapter starts here.</h1>
+@if (!Model.Any()) { <div class="empty"><h2>No trips yet</h2><a asp-controller="Home" asp-action="Index">Find your next stay</a></div> }
+@foreach (var booking in Model)
+{
+    <article class="panel">
+        <div class="row-between"><h2>@booking.Property?.Title</h2><span class="status">@booking.Status</span></div>
+        <p>Booking #@booking.Id · @booking.CheckInDate.ToString("dd MMM yyyy") – @booking.CheckOutDate.ToString("dd MMM yyyy") · @booking.Travelers travelers</p>
+        <p><strong>R @booking.TotalPrice.ToString("N2")</strong> total (cleaning R @booking.CleaningFee.ToString("N2"), service R @booking.ServiceFee.ToString("N2"))</p>
+        <div class="actions">
+        @if (booking.Status is BookingStatus.Approved or BookingStatus.CheckedIn) { <a class="button small" asp-controller="CheckIn" asp-action="Index" asp-route-bookingId="@booking.Id">Manage check-in</a> }
+        @if (booking.Status is BookingStatus.Pending or BookingStatus.Approved)
+        {
+            <form asp-action="Cancel" method="post"><input type="hidden" name="id" value="@booking.Id" /><button class="small secondary">Cancel booking</button></form>
+        }
+        <a asp-controller="Inbox" asp-action="Thread" asp-route-otherId="@booking.Property?.HostId">Message host</a>
+        </div>
+    </article>
+}

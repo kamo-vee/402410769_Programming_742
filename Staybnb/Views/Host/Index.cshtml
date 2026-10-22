@@ -1,0 +1,19 @@
+@model List<HostProperty>
+@{ ViewData["Title"] = "Host dashboard"; var approved = (List<int>)ViewBag.ApprovedIds; }
+<p class="eyebrow">Host dashboard</p><h1>Your places, your way.</h1><p>You have <strong>@ViewBag.PendingBookings</strong> pending booking request(s).</p>
+<a class="button" asp-action="BookingRequests">Review bookings &amp; check-in documents</a>
+<a class="button secondary" asp-controller="HostApplications" asp-action="CreateAdditional">Submit another property</a>
+<h2>Manage your listings</h2>
+@foreach (var property in Model)
+{
+    <article class="panel listing-row">
+        <img src="@property.Images.FirstOrDefault()?.ImageUrl" alt="@property.Title" />
+        <div><h2>@property.Title</h2><p>@property.City · R @property.PricePerNight.ToString("N2") / night</p><span class="status">@(approved.Contains(property.Id) ? (property.IsActive ? "Active" : "Paused") : "Not approved")</span>
+            <div class="actions">
+                <a asp-action="Edit" asp-route-id="@property.Id">Edit listing</a>
+                <a asp-action="CheckInSettings" asp-route-propertyId="@property.Id">Configure check-in</a>
+                @if (approved.Contains(property.Id)) { <form asp-action="ToggleListing" method="post"><input type="hidden" name="id" value="@property.Id" /><button class="small secondary">@(property.IsActive ? "Pause listing" : "Activate listing")</button></form> }
+            </div>
+        </div>
+    </article>
+}

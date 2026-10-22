@@ -1,0 +1,44 @@
+@model List<HostProperty>
+@{ ViewData["Title"] = "Explore stays"; }
+<section class="hero">
+    <p class="eyebrow">A place for every journey</p>
+    <h1>Somewhere you'll<br />love to stay.</h1>
+    <p>Discover welcoming homes and memorable escapes, hosted by people who care.</p>
+</section>
+<form asp-action="Index" method="get" class="search-bar">
+    <div><label for="city">Where?</label><input id="city" name="city" value="@ViewBag.City" placeholder="Search a city" /></div>
+    <div><label for="propertyType">Property type</label><select id="propertyType" name="propertyType">
+        <option value="">All types</option>
+        @foreach (string type in ViewBag.PropertyTypes)
+        {
+            <option value="@type" selected="@(ViewBag.PropertyType == type)">@type</option>
+        }
+    </select></div>
+    <button type="submit">Search stays</button>
+    <a asp-action="Index">Clear filters</a>
+</form>
+<div class="section-heading"><h2>Find your next stay</h2><span class="muted">@Model.Count available listing(s)</span></div>
+@if (Model.Count == 0)
+{
+    <div class="empty">
+        <h3>No stays here yet</h3>
+        <p>Try another city or property type. New listings appear after an administrator approves a host application.</p>
+        @if (User.IsInRole("Guest")) { <a class="button" asp-controller="HostApplications" asp-action="Create">List your first property</a> }
+    </div>
+}
+<div class="property-grid">
+@foreach (var property in Model)
+{
+    <article class="property-card">
+        <a asp-controller="Properties" asp-action="Details" asp-route-id="@property.Id">
+            <img src="@property.Images.FirstOrDefault()?.ImageUrl" alt="@property.Title" loading="lazy" />
+            <div class="card-body">
+                <span class="muted">@property.City · @property.PropertyType</span>
+                <h3>@property.Title</h3>
+                <p>Up to @property.MaxGuests guests</p>
+                <p><strong>R @property.PricePerNight.ToString("N2")</strong> <span class="muted">/ night</span></p>
+            </div>
+        </a>
+    </article>
+}
+</div>

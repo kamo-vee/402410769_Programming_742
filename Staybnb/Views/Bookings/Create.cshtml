@@ -1,0 +1,26 @@
+@model BookingCreateViewModel
+@{
+    ViewData["Title"] = "Request a booking";
+    var property = (HostProperty)ViewBag.Property;
+    var nights = Math.Max(0, (Model.CheckOutDate.Date - Model.CheckInDate.Date).Days);
+    var subtotal = property.PricePerNight * nights;
+    var service = Math.Round(subtotal * .10m, 2);
+}
+<div class="two-column">
+<section class="panel"><h1>Make your stay official</h1><h2>@property.Title</h2><p>@property.City · Maximum @property.MaxGuests travelers</p>
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="All" class="validation"></div><input asp-for="PropertyId" type="hidden" />
+        <label asp-for="CheckInDate">Check-in</label><input asp-for="CheckInDate" type="date" />
+        <label asp-for="CheckOutDate">Check-out</label><input asp-for="CheckOutDate" type="date" />
+        <label asp-for="Travelers">Travelers</label><input asp-for="Travelers" type="number" min="1" max="@property.MaxGuests" />
+        <div class="actions"><button name="intent" value="preview" class="secondary">Calculate total</button><button name="intent" value="request">Request booking</button></div>
+    </form>
+</section>
+<aside class="panel"><h2>Price breakdown</h2>
+    <p>R @property.PricePerNight.ToString("N2") × @nights night(s) <strong>R @subtotal.ToString("N2")</strong></p>
+    <p>Cleaning fee <strong>R @property.CleaningFee.ToString("N2")</strong></p><p>Service fee (10%) <strong>R @service.ToString("N2")</strong></p>
+    <hr /><h3>Total: R @((subtotal + property.CleaningFee + service).ToString("N2"))</h3>
+    <p class="muted">Change the dates and choose “Calculate total” to refresh the quote. Prices are recalculated on the server when you request the booking.</p>
+    <p class="muted">No real payment is collected by this educational application.</p>
+</aside>
+</div>

@@ -1,0 +1,16 @@
+@model RegisterViewModel
+@{ ViewData["Title"] = "Create an account"; }
+<section class="panel narrow">
+    <p class="eyebrow">Welcome to Staybnb</p><h1>Create your account</h1><p class="muted">Every new account starts as a Guest. You can apply to become a Host later.</p>
+    <form asp-action="Register" method="post">
+        <div asp-validation-summary="All" class="validation"></div>
+        <label asp-for="FirstName">First name</label><input asp-for="FirstName" autocomplete="given-name" />
+        <label asp-for="LastName">Last name</label><input asp-for="LastName" autocomplete="family-name" />
+        <label asp-for="Email">Email address</label><input asp-for="Email" autocomplete="email" />
+        <label asp-for="Password">Password</label><input asp-for="Password" autocomplete="new-password" />
+        <p class="muted">At least 8 characters, including uppercase, lowercase, a number, and a symbol.</p>
+        <label asp-for="ConfirmPassword">Confirm password</label><input asp-for="ConfirmPassword" autocomplete="new-password" />
+        <button type="submit">Create Guest account</button>
+    </form>
+    <p>Already registered? <a asp-action="Login">Log in</a></p>
+</section>

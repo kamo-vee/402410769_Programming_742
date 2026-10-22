@@ -1,0 +1,45 @@
+@using System.Text.Json
+@using Staybnb.Services
+@model GuestCheckIn
+@{
+    ViewData["Title"] = "Guest check-in";
+    var steps = JsonSerializer.Deserialize<List<string>>(Model.CheckInProcess?.StepsJson ?? "[]") ?? new();
+    var requirement = Model.CheckInProcess?.DocumentRequirement ?? DocumentRequirement.IdOrPassport;
+}
+<p class="eyebrow">Booking #@Model.BookingId · @Model.Booking?.Status</p><h1>Welcome to @Model.Booking?.Property?.Title</h1>
+<section class="panel"><h2>1. Read and accept the house rules</h2><h3>@Model.CheckInProcess?.Title</h3>
+    <ol>@foreach (var step in steps) { <li>@step</li> }</ol>
+    <p><strong>Documents to verify:</strong> @CheckInRequirements.Describe(requirement)</p>
+    <p><strong>Host's document instructions:</strong> @Model.CheckInProcess?.RequiredDocuments</p>
+    @if (Model.RulesAcceptedAt is null)
+    {
+        <form asp-action="AcceptRules" method="post"><input type="hidden" name="bookingId" value="@Model.BookingId" /><label class="checkbox"><input type="checkbox" name="accepted" value="true" />I have read and accept these rules.</label><button>Accept rules</button></form>
+    }
+    else { <p class="success-text">Rules accepted @Model.RulesAcceptedAt.Value.ToString("dd MMM yyyy HH:mm") UTC.</p> }
+</section>
+<section class="panel"><h2>2. Upload your ID or Passport</h2><p>Documents are private and available only to you and this property's Host. Use dummy documents for demonstrations.</p>
+    @if (Model.RulesAcceptedAt is not null && Model.Booking!.Status == BookingStatus.Approved)
+    {
+        <form asp-action="Upload" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="bookingId" value="@Model.BookingId" /><label for="documentType">Document type</label>
+            <select id="documentType" name="documentType">
+                @if (CheckInRequirements.Allows(requirement, "ID")) { <option>ID</option> }
+                @if (CheckInRequirements.Allows(requirement, "Passport")) { <option>Passport</option> }
+            </select>
+            <label for="file">Document file (PDF, JPG, PNG; max 10 MB)</label><input id="file" name="file" type="file" accept=".pdf,.jpg,.jpeg,.png" required />
+            <button>Upload for verification</button>
+        </form>
+    }
+    @foreach (var document in Model.Documents)
+    {
+        <p><a asp-action="Download" asp-route-id="@document.Id">@document.DocumentType</a> <span class="status">@document.Status</span></p>
+    }
+</section>
+<section class="panel"><h2>3. Complete check-in</h2>
+    @if (Model.Booking!.Status == BookingStatus.CheckedIn) { <p class="success-text">You are checked in. Enjoy your stay!</p> }
+    else if (Model.RulesAcceptedAt is not null && CheckInRequirements.IsSatisfied(Model))
+    {
+        <form asp-action="Complete" method="post"><input type="hidden" name="bookingId" value="@Model.BookingId" /><button>Complete check-in</button></form>
+    }
+    else { <p>Accept the rules and wait for the Host to verify all required documents, then return to complete check-in.</p> }
+</section>

@@ -1,0 +1,7 @@
+@model ComposeViewModel
+@{ ViewData["Title"] = "New message"; }
+<section class="panel form-panel"><h1>New message</h1><form asp-action="Compose" method="post">
+    <div asp-validation-summary="All" class="validation"></div>
+    <label asp-for="Email">Recipient's registered email</label><input asp-for="Email" />
+    <label asp-for="Content">Message</label><textarea asp-for="Content" rows="6" maxlength="2000"></textarea><button>Send message</button>
+</form></section>
