@@ -6,7 +6,7 @@ using Staybnb.Data;
 using Staybnb.Models;
 using Staybnb.Services;
 
-namespace Staybnb.Controllers;
+
 
 [Authorize(Roles = StaybnbRoles.Admin + "," + StaybnbRoles.SuperAdmin)]
 public class AdminController(
